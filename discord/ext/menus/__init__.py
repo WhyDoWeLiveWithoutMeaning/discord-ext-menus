@@ -308,6 +308,8 @@ class Menu(metaclass=_MenuMeta):
         delete the reactions one by one.
     check_embeds: :class:`bool`
         Whether to verify embed permissions as well.
+    always_clear_reaction: :class:`bool`
+        Whether to remove the reaction every time after its invoked.
     ctx: Optional[:class:`commands.Context`]
         The context that started this pagination session or ``None`` if it hasn't
         been started yet.
@@ -573,6 +575,7 @@ class Menu(metaclass=_MenuMeta):
                 # Exception will propagate if e.g. cancelled or timed out
                 payload = done.pop().result()
 
+                # If it should always clear the reaction after being called
                 if self.always_clear_reaction:
                     m = await self.ctx.channel.fetch_message(payload.message_id)
                     await m.remove_reaction(payload.emoji, payload.member)
