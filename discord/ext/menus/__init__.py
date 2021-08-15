@@ -321,11 +321,13 @@ class Menu(metaclass=_MenuMeta):
         message you want to attach a menu to.
     """
     def __init__(self, *, timeout=180.0, delete_message_after=False,
-                          clear_reactions_after=False, check_embeds=False, message=None):
+                          clear_reactions_after=False, check_embeds=False,
+                          always_clear_reaction=False, message=None):
 
         self.timeout = timeout
         self.delete_message_after = delete_message_after
         self.clear_reactions_after = clear_reactions_after
+        self.always_clear_reaction = always_clear_reaction
         self.check_embeds = check_embeds
         self._can_remove_reactions = False
         self.__tasks = []
@@ -570,6 +572,11 @@ class Menu(metaclass=_MenuMeta):
 
                 # Exception will propagate if e.g. cancelled or timed out
                 payload = done.pop().result()
+
+                if self.always_clear_reaction:
+                    m = await self.ctx.channel.fetch_message(payload.message_id)
+                    await m.remove_reaction(payload.emoji, payload.member)
+
                 loop.create_task(self.update(payload))
 
                 # NOTE: Removing the reaction ourselves after it's been done when
